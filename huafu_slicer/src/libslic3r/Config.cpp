@@ -300,7 +300,7 @@ ConfigOption* ConfigOptionDef::create_empty_option() const
 
 ConfigOption* ConfigOptionDef::create_default_option() const
 {
-    if (this->default_value)
+    if (this->default_value) //此ConfigOptionDef有缺省值
         return (this->default_value->type() == coEnum) ?
             // Special case: For a DynamicConfig, convert a templated enum to a generic enum.
             new ConfigOptionEnumGeneric(this->enum_def->m_enum_keys_map, this->default_value->getInt()) : 
@@ -395,19 +395,19 @@ void ConfigBase::apply_only(const ConfigBase &other, const t_config_option_keys 
         // Create a new option with default value for the key.
         // If the key is not in the parameter definition, or this ConfigBase is a static type and it does not support the parameter,
         // an exception is thrown if not ignore_nonexistent.
-        ConfigOption *my_opt = this->option(opt_key, true);
+        ConfigOption *my_opt = this->option(opt_key, true); //从当前Config中返回指定key的ConfigOption，如不存在，则创建，若当前Config中没有opt_key对应的ConfigOptionDef，返回nullptr
         if (my_opt == nullptr) {
             // opt_key does not exist in this ConfigBase and it cannot be created, because it is not defined by this->def().
             // This is only possible if other is of DynamicConfig type.
-            if (ignore_nonexistent)
+            if (ignore_nonexistent) //若允许other中存在的option的key在本config中不存在，忽略
                 continue;
-            throw UnknownOptionException(opt_key);
+            throw UnknownOptionException(opt_key); //负责，抛出key异常
         }
-		const ConfigOption *other_opt = other.option(opt_key);
-		if (other_opt == nullptr) {
+		const ConfigOption *other_opt = other.option(opt_key); //获取other中opt_key对应的ConfigOption
+		if (other_opt == nullptr) { //若other中没有此opt_key对应的ConfigOption，忽略
             // The key was not found in the source config, therefore it will not be initialized!
 //			printf("Not found, therefore not initialized: %s\n", opt_key.c_str());
-		} else
+		} else //否则，复制
             my_opt->set(other_opt);
     }
 }
@@ -1089,22 +1089,22 @@ size_t DynamicConfig::remove_nil_options()
 ConfigOption* DynamicConfig::optptr(const t_config_option_key &opt_key, bool create)
 {
     auto it = options.find(opt_key);
-    if (it != options.end())
+    if (it != options.end()) //从options中找到了opt_key对应的ConfigOption
         // Option was found.
         return it->second.get();
-    if (! create)
+    if (! create)  //若没找到，且不创建，返回nullptr
         // Option was not found and a new option shall not be created.
         return nullptr;
     // Try to create a new ConfigOption.
-    const ConfigDef       *def    = this->def();
-    if (def == nullptr)
+    const ConfigDef       *def    = this->def();  //获取该配置的ConfigDef指针
+    if (def == nullptr) //若该配置的ConfigDef指针为nullptr，抛出异常
         throw NoDefinitionException(opt_key);
-    const ConfigOptionDef *optdef = def->get(opt_key);
-    if (optdef == nullptr)
+    const ConfigOptionDef *optdef = def->get(opt_key); //获取该opt_key对应的ConfigOptionDef对象指针
+    if (optdef == nullptr) //该Config中没有与此opt_key对应的ConfigOptionDef，返回nullptr（无定义，不创建）
 //        throw ConfigurationError(std::string("Invalid option name: ") + opt_key);
         // Let the parent decide what to do if the opt_key is not defined by this->def().
         return nullptr;
-    ConfigOption *opt = optdef->create_default_option();
+    ConfigOption *opt = optdef->create_default_option(); //有与此opt_key对应的ConfigOptionDef指针，利用其创建缺省的ConfigOption
     this->options.emplace_hint(it, opt_key, std::unique_ptr<ConfigOption>(opt));
     return opt;
 }

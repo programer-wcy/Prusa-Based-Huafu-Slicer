@@ -128,6 +128,8 @@ set(SLIC3R_SOURCES
     Fill/Lightning/TreeNode.hpp
     Fill/FillRectilinear.cpp
     Fill/FillRectilinear.hpp
+    Fill/FillBridge.cpp
+    Fill/FillBridge.hpp
     Flow.cpp
     Flow.hpp
     format.hpp

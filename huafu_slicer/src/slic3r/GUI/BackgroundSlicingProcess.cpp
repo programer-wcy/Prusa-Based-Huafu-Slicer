@@ -46,6 +46,8 @@
 
 namespace Slic3r {
 
+//判断当前捕获的异常是否为critial（严重） error： 
+// 1. 重新抛出（之前捕获了），若是SlicingError（切片错误），不认为是，返回false。 2. 否则将其catch到，不做处理，返回true
 bool SlicingProcessCompletedEvent::critical_error() const
 {
 	try {
@@ -58,6 +60,7 @@ bool SlicingProcessCompletedEvent::critical_error() const
 	return true;
 }
 
+// 判断是否需要对plater进行invalidate（失效）处理或标记，若是严重错误，但是类型为拷贝/导出文件错误，plater不需invalidate，否则需要
 bool SlicingProcessCompletedEvent::invalidate_plater() const
 {
 	if (critical_error())
@@ -76,6 +79,7 @@ bool SlicingProcessCompletedEvent::invalidate_plater() const
 	return false;
 }
 
+//重新抛出捕获的异常，根据异常类型，设置错误信息，同时是指是否使用等宽字体输出（monospace）
 std::pair<std::string, bool> SlicingProcessCompletedEvent::format_error_message() const
 {
 	std::string error;
@@ -102,7 +106,7 @@ std::pair<std::string, bool> SlicingProcessCompletedEvent::format_error_message(
 	return std::make_pair(std::move(error), monospace);
 }
 
-void BackgroundSlicingProcess::set_temp_output_path(int bed_idx)
+void BackgroundSlicingProcess::set_temp_output_path(int bed_idx) //根据线程ID和床的编号生成临时输出路径
 {
     boost::filesystem::path temp_path(wxStandardPaths::Get().GetTempDir().utf8_str().data());
     temp_path /= (boost::format(".%1%_%2%.gcode") % get_current_pid() % bed_idx).str();
@@ -128,6 +132,7 @@ BackgroundSlicingProcess::~BackgroundSlicingProcess()
     }
 }
 
+//根据传入的PrinterTechnology，来确定m_print指向m_fff_print还是m_sla_print，if之后的逻辑看起来有点儿奇怪
 bool BackgroundSlicingProcess::select_technology(PrinterTechnology tech)
 {
 	bool changed = false;
@@ -147,6 +152,7 @@ bool BackgroundSlicingProcess::select_technology(PrinterTechnology tech)
 	return changed;
 }
 
+//返回当前打印任务使用的技术
 PrinterTechnology BackgroundSlicingProcess::current_printer_technology() const
 {
 	return m_print->technology();
@@ -468,9 +474,9 @@ bool BackgroundSlicingProcess::stop()
 	if (m_state == STATE_STARTED || m_state == STATE_RUNNING) {
 		// Cancel any task planned by the background thread on UI thread.
 		cancel_ui_task(m_ui_task);
-		m_print->cancel();
+		m_print->cancel(); //设置当前打印任务的状态为：CANCELED_BY_USER
 		// Wait until the background processing stops by being canceled.
-		m_condition.wait(lck, [this](){ return m_state == STATE_CANCELED; });
+		m_condition.wait(lck, [this](){ return m_state == STATE_CANCELED; }); //等待直到m_state为STATE_CANCELED，之后解锁lck(m_mutex)
 		// In the "Canceled" state. Reset the state to "Idle".
 		m_state = STATE_IDLE;
 		m_print->set_cancel_callback([](){});

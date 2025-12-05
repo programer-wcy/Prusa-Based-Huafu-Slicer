@@ -38,6 +38,7 @@
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Line.hpp"
 #include "libslic3r/ShortestPath.hpp"
+#include "FillBridge.hpp"
 
 // #define INFILL_DEBUG_OUTPUT
 
@@ -68,6 +69,7 @@ Fill* Fill::new_from_type(const InfillPattern type)
     case ipLightning:           return new FillLightning::Filler();
     case ipEnsuring:            return new FillEnsuring();
     case ipZigZag:              return new FillZigZag();
+    case ipDoublelineBridging:  return new FillBridge();
     default: throw Slic3r::InvalidArgument("unknown type");
     }
 }

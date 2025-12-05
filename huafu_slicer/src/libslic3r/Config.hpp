@@ -2506,26 +2506,26 @@ typedef std::map<t_config_option_key, ConfigOptionDef> t_optiondef_map;
 class ConfigDef
 {
 public:
-    t_optiondef_map         					options;
-    std::map<size_t, const ConfigOptionDef*>	by_serialization_key_ordinal;
+    t_optiondef_map         					options;     //通过关键字mapping到ConfigOptionDef的map
+    std::map<size_t, const ConfigOptionDef*>	by_serialization_key_ordinal; //通过序列号索引ConfigOptionDef的map
 
-    bool                    has(const t_config_option_key &opt_key) const { return this->options.count(opt_key) > 0; }
+    bool                    has(const t_config_option_key &opt_key) const { return this->options.count(opt_key) > 0; } //判断是否具有指定关键字的ConfigOptionDef
     const ConfigOptionDef*  get(const t_config_option_key &opt_key) const {
-        t_optiondef_map::iterator it = const_cast<ConfigDef*>(this)->options.find(opt_key);
+        t_optiondef_map::iterator it = const_cast<ConfigDef*>(this)->options.find(opt_key); //由于是const函数，进行显示转换得到非const的iterator
         return (it == this->options.end()) ? nullptr : &it->second;
     }
-    std::vector<std::string> keys() const {
+    std::vector<std::string> keys() const {  //返回options中所有的key（以vector<std::string>变量返回）
         std::vector<std::string> out;
         out.reserve(options.size());
         for(auto const& kvp : options)
             out.push_back(kvp.first);
         return out;
     }
-    bool                    empty() const { return options.empty(); }
+    bool                    empty() const { return options.empty(); } //判断options是否为空
 
 protected:
-    ConfigOptionDef*        add(const t_config_option_key &opt_key, ConfigOptionType type);
-    ConfigOptionDef*        add_nullable(const t_config_option_key &opt_key, ConfigOptionType type);
+    ConfigOptionDef*        add(const t_config_option_key &opt_key, ConfigOptionType type);  //创建一个指定key的ConfigOptionDef，指定其key和序号，并将其加入options和by_serialization_key_ordinal，其他成员的设置通过返回指针另行设置
+    ConfigOptionDef*        add_nullable(const t_config_option_key &opt_key, ConfigOptionType type); //和前一个类似，只是将创建的ConfigOptionDef对象的nullable成员设为true
     // Finalize open / close enums, validate everything.
     void                    finalize();
 };
@@ -2540,20 +2540,20 @@ public:
     virtual ~ConfigOptionResolver() {}
 
     // Find a ConfigOption instance for a given name.
-    virtual const ConfigOption* optptr(const t_config_option_key &opt_key) const = 0;
+    virtual const ConfigOption* optptr(const t_config_option_key &opt_key) const = 0; //纯虚函数，通过key得到ConfigOption的指针(不存在的话，返回nullptr?)
 
-    bool 						has(const t_config_option_key &opt_key) const { return this->optptr(opt_key) != nullptr; }
+    bool 						has(const t_config_option_key &opt_key) const { return this->optptr(opt_key) != nullptr; } //判断指定key的ConfigOption是否存在
     
     const ConfigOption* 		option(const t_config_option_key &opt_key) const { return this->optptr(opt_key); }
 
     template<typename TYPE>
-    const TYPE* 				option(const t_config_option_key& opt_key) const
+    const TYPE* 				option(const t_config_option_key& opt_key) const //模板函数，得到指定key的ConfigOption指针，若为空或其类型和期待类型不一致，返回nullptr，否则进行类型转换，返回所得指针
     {
         const ConfigOption* opt = this->optptr(opt_key);
         return (opt == nullptr || opt->type() != TYPE::static_type()) ? nullptr : static_cast<const TYPE*>(opt);
     }
 
-    const ConfigOption* 		option_throw(const t_config_option_key& opt_key) const
+    const ConfigOption* 		option_throw(const t_config_option_key& opt_key) const //通过key获取ConfigOption，若为空抛出异常，否则返回得到的ConfigOption指针
     {
         const ConfigOption* opt = this->optptr(opt_key);
         if (opt == nullptr)
@@ -2562,7 +2562,7 @@ public:
     }
 
     template<typename TYPE>
-    const TYPE* 				option_throw(const t_config_option_key& opt_key) const
+    const TYPE* 				option_throw(const t_config_option_key& opt_key) const //模板函数，若为空或类型不匹配，抛出异常，否则返回经类型转换后的ConfigOption指针
     {
         const ConfigOption* opt = this->option_throw(opt_key);
         if (opt->type() != TYPE::static_type())
@@ -2589,7 +2589,7 @@ public:
     // Static configuration definition. Any value stored into this ConfigBase shall have its definition here.
     virtual const ConfigDef*        def() const = 0;
     // Find ando/or create a ConfigOption instance for a given name.
-    using ConfigOptionResolver::optptr;
+    using ConfigOptionResolver::optptr; //避免ConfigOptionResolver类中的此函数被下面的同名函数隐藏从而不可见
     virtual ConfigOption*           optptr(const t_config_option_key &opt_key, bool create = false) = 0;
     // Collect names of all configuration values maintained by this configuration store.
     virtual t_config_option_keys    keys() const = 0;
@@ -2650,17 +2650,17 @@ public:
     // Apply all keys of other ConfigBase defined by this->def() to this ConfigBase.
     // An UnknownOptionException is thrown in case some option keys of other are not defined by this->def(),
     // or this ConfigBase is of a StaticConfig type and it does not support some of the keys, and ignore_nonexistent is not set.
-    void apply(const ConfigBase &other, bool ignore_nonexistent = false) { this->apply_only(other, other.keys(), ignore_nonexistent); }
+    void apply(const ConfigBase &other, bool ignore_nonexistent = false) { this->apply_only(other, other.keys(), ignore_nonexistent); }  //try to 复制other中的ConfigOption到本config
     // Apply explicitely enumerated keys of other ConfigBase defined by this->def() to this ConfigBase.
     // An UnknownOptionException is thrown in case some option keys are not defined by this->def(),
     // or this ConfigBase is of a StaticConfig type and it does not support some of the keys, and ignore_nonexistent is not set.
     void apply_only(const ConfigBase &other, const t_config_option_keys &keys, bool ignore_nonexistent = false);
     // Are the two configs equal? Ignoring options not present in both configs.
-    bool equals(const ConfigBase &other) const;
+    bool equals(const ConfigBase &other) const; //变量当前对象的ConfigOption的关键字，若二者均存在同一关键字对应的ConfigOption，但是二者不相等（不同类型的ConfigOption要重载==和!=运算符），返回false，否则返回true
     // Returns options differing in the two configs, ignoring options not present in both configs.
-    t_config_option_keys diff(const ConfigBase &other) const;
+    t_config_option_keys diff(const ConfigBase &other) const; //返回key对应的ConfigOption在本Config和other中均存在且相等（!=）的key的列表
     // Returns options being equal in the two configs, ignoring options not present in both configs.
-    t_config_option_keys equal(const ConfigBase &other) const;
+    t_config_option_keys equal(const ConfigBase &other) const; //返回key对应的ConfigOption在本Config和other中均存在且相等（==）的key的列表
     std::string opt_serialize(const t_config_option_key &opt_key) const;
 
     // Set a value. Convert numeric types using a C style implicit conversion / promotion model.

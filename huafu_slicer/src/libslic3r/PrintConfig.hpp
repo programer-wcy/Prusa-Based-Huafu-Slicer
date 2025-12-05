@@ -107,7 +107,8 @@ enum InfillPattern : int {
     ipLightning,
     ipEnsuring,
     ipZigZag,
-    ipCount,
+    ipDoublelineBridging, // Added by wangcy: 双线桥接填充
+    ipCount
 };
 
 enum class IroningType {

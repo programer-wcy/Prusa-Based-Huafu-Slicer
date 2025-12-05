@@ -526,7 +526,7 @@ std::string fix_slicing_errors(LayerPtrs &layers, const std::function<void()> &t
 // Resulting expolygons of layer regions are marked as Internal.
 void PrintObject::slice()
 {
-    if (! this->set_started(posSlice))
+    if (! this->set_started(posSlice))  //设置打印对象的当前步骤为posSlice
         return;
     m_print->set_status(10, _u8L("Processing triangulated mesh"));
     std::vector<coordf_t> layer_height_profile;
