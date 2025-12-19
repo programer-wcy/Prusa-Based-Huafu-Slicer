@@ -662,9 +662,28 @@ void MainFrame::set_callbacks_for_topbar_menus()
     if (wxGetApp().app_config->has("show_login_button"))
         m_bar_menus.RemoveHideLoginItem();
 }
-
+/**/
+class MyClassB
+{
+public:
+    void init(int &intval) { 
+        //cout << "引用" << endl;;
+         
+        intval++;
+    }
+    void init(int &&intval) {
+        //cout << "2级引用" << endl;
+         
+        ++intval;
+        }
+};
 void MainFrame::init_tabpanel()
 {
+    int aa = 10;
+
+    MyClassB().init(10);
+    MyClassB().init(aa);
+
     wxGetApp().update_ui_colours_from_appconfig();
 
     set_callbacks_for_topbar_menus();
