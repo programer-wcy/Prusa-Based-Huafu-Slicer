@@ -1175,7 +1175,22 @@ void PrintConfigDef::init_fff_params()
     def->min = 0;
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionFloat(20));
+    ///////////////////////////////////
+    def = this->add("carbon_fiber_pre_extrude_length", coFloat);
+    def->label = L("Carbon Fiber pre_extrude length");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(45));
 
+    def = this->add("carbon_fiber_cut_reserve_length", coFloat);
+    def->label = L("carbon_fiber_cut_reserve_length");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(30));
+
+    /////////////////////////////////
     def = this->add("extruder_colour", coStrings);
     def->label = L("Extruder Color");
     def->tooltip = L("This is only used in the Slic3r interface as a visual help.");
@@ -6195,6 +6210,12 @@ PrintStatisticsConfigDef::PrintStatisticsConfigDef()
     def = this->add("total_layer_count", coInt);
     def->label = L("Total layer count");
     def->tooltip = L("Number of layers in the entire print.");
+
+
+    def = this->add("custom_extrusion_command", coFloats);
+    def->label = L("custom command");
+    def->tooltip = L("custom command");
+
 }
 
 ObjectsInfoConfigDef::ObjectsInfoConfigDef()

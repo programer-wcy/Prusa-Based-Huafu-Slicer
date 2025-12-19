@@ -427,6 +427,7 @@ private:
     // How many times will change_layer() be called?
     // change_layer() will update the progress bar.
     unsigned int                        m_layer_count;
+
     // Progress bar indicator. Increments from -1 up to layer_count.
     int                                 m_layer_index;
     // Current layer processed. In sequential printing mode, only a single copy will be printed.
@@ -442,7 +443,7 @@ private:
     float                               m_last_layer_z{ 0.0f };
     float                               m_max_layer_z{ 0.0f };
     float                               m_last_width{ 0.0f };
-
+    float                               m_custom_data;
     std::optional<Vec3d>                m_previous_layer_last_position;
     std::optional<Vec3d>                m_previous_layer_last_position_before_wipe;
     bool                                m_moved_to_first_layer_point{false};

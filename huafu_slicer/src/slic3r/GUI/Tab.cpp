@@ -1424,7 +1424,7 @@ static void validate_custom_parameters(Tab* tab, const t_config_option_key& opt_
 }
 
 void TabPrint::build()
-{
+{   
     m_presets = &m_preset_bundle->prints;
     load_initial_data();
 
@@ -2878,6 +2878,10 @@ void TabPrinter::build_fff()
         optgroup = page->new_optgroup(L("Sequential printing limits"));
         optgroup->append_single_option_line("extruder_clearance_radius");
         optgroup->append_single_option_line("extruder_clearance_height");
+
+        optgroup = page->new_optgroup(L("Carbon Fiber Specific Parameters"));
+        optgroup->append_single_option_line("carbon_fiber_pre_extrude_length");
+        optgroup->append_single_option_line("carbon_fiber_cut_reserve_length");
 
     const int gcode_field_height = 15; // 150
     const int notes_field_height = 25; // 250
