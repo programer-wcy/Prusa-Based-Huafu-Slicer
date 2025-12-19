@@ -311,10 +311,6 @@ int wmain(int argc, wchar_t **argv)
         printf("PrusaSlicer.dll was not loaded\n");
         return -1;
     }
-    std::string src = "dsa";
-    std::string dest = std::move(src);
-
-
 
     // resolve function address here
     slic3r_main = (Slic3rMainFunc)GetProcAddress(hInstance_Slic3r,

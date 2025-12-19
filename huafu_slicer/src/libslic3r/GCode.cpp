@@ -566,8 +566,7 @@ GCodeGenerator::GCodeGenerator(const Print* print) :
     m_enable_cooling_markers(false), 
     m_enable_extrusion_role_markers(false),
     m_last_processor_extrusion_role(GCodeExtrusionRole::None),
-    m_layer_count(0), 
-    m_custom_data(888),
+    m_layer_count(0),
     m_layer_index(-1), 
     m_layer(nullptr),
     m_object_layer_over_raft(false),
@@ -1195,7 +1194,6 @@ void GCodeGenerator::_do_export(Print& print, GCodeOutputStream &file, Thumbnail
     this->placeholder_parser().set("has_wipe_tower", has_wipe_tower);
     this->placeholder_parser().set("has_single_extruder_multi_material_priming", has_wipe_tower && print.config().single_extruder_multi_material_priming);
     this->placeholder_parser().set("total_toolchanges", tool_ordering.toolchanges_count());
-    this->placeholder_parser().set("custom_extrusion_command", m_custom_data);//888
     {
         BoundingBoxf bbox(print.config().bed_shape.values);
         assert(bbox.defined);
