@@ -392,7 +392,7 @@ bool OpenGLManager::init_gl()
             message += "\n";
             message += _L("As a workaround, you may run PrusaSlicer with a software rendered 3D graphics by running prusa-slicer.exe with the --sw-renderer parameter.");
 #endif
-        	wxMessageBox(message, wxString("PrusaSlicer - ") + _L("Unsupported OpenGL version"), wxOK | wxICON_ERROR);
+        	wxMessageBox(message, wxString("Slicer - ") + _L("Unsupported OpenGL version"), wxOK | wxICON_ERROR);
         }
 
         if (valid_version) {
@@ -400,7 +400,7 @@ bool OpenGLManager::init_gl()
             auto [result, error] = m_shaders_manager.init();
             if (!result) {
                 wxString message = format_wxstr(_L("Unable to load the following shaders:\n%s"), error);
-                wxMessageBox(message, wxString("PrusaSlicer - ") + _L("Error loading shaders"), wxOK | wxICON_ERROR);
+                wxMessageBox(message, wxString("Slicer - ") + _L("Error loading shaders"), wxOK | wxICON_ERROR);
             }
 #if !SLIC3R_OPENGL_ES
             if (m_debug_enabled && s_gl_info.is_version_greater_or_equal_to(4, 3) && GLEW_KHR_debug) {

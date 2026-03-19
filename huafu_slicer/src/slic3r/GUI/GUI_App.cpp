@@ -296,17 +296,18 @@ private:
         void init(wxFont init_font)
         {
             // title
-            title = wxGetApp().is_editor() ? SLIC3R_APP_NAME : GCODEVIEWER_APP_NAME;
-
+            //title = wxGetApp().is_editor() ? SLIC3R_APP_NAME : GCODEVIEWER_APP_NAME;
+            title =  L"Slicer";
             // dynamically get the version to display
-            version = _L("Version") + " " + std::string(SLIC3R_VERSION);
-
+            //version = _L("Version") + " " + std::string(SLIC3R_VERSION);
+            version = L"1.1";
             // credits infornation
+            /**/
             credits = "\n" + title + " " +
                 _L("is based on Slic3r by Alessandro Ranellucci and the RepRap community.") + "\n\n" +
-                _L("Developed by Prusa Research.") + "\n\n" +
+                _L("Developed by HuaFuLianLi co.") + "\n\n" +//Prusa Research
                 _L("Licensed under GNU AGPLv3.") + "\n\n\n\n\n\n\n";
-
+            
             title_font = version_font = credits_font = init_font;
         }
     } 
@@ -1437,7 +1438,7 @@ bool GUI_App::on_init_inner()
             RichMessageDialog
                 dlg(nullptr,
                     wxString::Format(_L("%s\nDo you want to continue?"), msg),
-                    "PrusaSlicer", wxICON_QUESTION | wxYES_NO);
+                    "Slicer", wxICON_QUESTION | wxYES_NO);
             dlg.ShowCheckBox(_L("Remember my choice"));
             if (dlg.ShowModal() != wxID_YES) return false;
 
