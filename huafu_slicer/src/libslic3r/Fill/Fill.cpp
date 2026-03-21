@@ -547,6 +547,7 @@ void Layer::make_fills(FillAdaptive::Octree* adaptive_fill_octree, FillAdaptive:
         params.use_arachne                = (perimeter_generator == PerimeterGeneratorType::Arachne && surface_fill.params.pattern == ipConcentric) || surface_fill.params.pattern == ipEnsuring;
         params.layer_height               = layerm.layer()->height;
         params.prefer_clockwise_movements = this->object()->print()->config().prefer_clockwise_movements;
+        params.carbon_fiber_parallel_line_spacing = this->object()->print()->config().carbon_fiber_parallel_line_spacing; // added by wangcy
 
         for (ExPolygon &expoly : surface_fill.expolygons) {
 			// Spacing is modified by the filler to indicate adjustments. Reset it for each expolygon.
@@ -736,6 +737,8 @@ Polylines Layer::generate_sparse_infill_polylines_for_anchoring(FillAdaptive::Oc
         params.resolution        = resolution;
         params.use_arachne       = false;
         params.layer_height      = layerm.layer()->height;
+        params.carbon_fiber_parallel_line_spacing =
+            this->object()->print()->config().carbon_fiber_parallel_line_spacing;
 
         for (ExPolygon &expoly : surface_fill.expolygons) {
             // Spacing is modified by the filler to indicate adjustments. Reset it for each expolygon.

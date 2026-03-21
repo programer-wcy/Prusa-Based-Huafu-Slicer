@@ -88,6 +88,9 @@ struct FillParams
 
     // For infills that produce closed loops to force printing those loops clockwise.
     bool        prefer_clockwise_movements { false };
+
+    //added by wangcy: 连续纤维相邻线条的轴心距离
+    float       carbon_fiber_parallel_line_spacing  {0.6f};
 };
 static_assert(IsTriviallyCopyable<FillParams>::value, "FillParams class is not POD (and it should be - see constructor).");
 

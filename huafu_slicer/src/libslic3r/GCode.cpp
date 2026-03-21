@@ -1856,7 +1856,7 @@ void GCodeGenerator::print_machine_envelope(GCodeOutputStream &file, const Print
     const GCodeFlavor flavor = print.config().gcode_flavor.value;
     if ( (flavor == gcfMarlinLegacy || flavor == gcfMarlinFirmware || flavor == gcfRepRapFirmware)
      && print.config().machine_limits_usage.value == MachineLimitsUsage::EmitToGCode) {
-        int factor = flavor == gcfRepRapFirmware ? 60 : 1; // RRF M203 and M566 are in mm/min
+        int factor = flavor == gcfRepRapFirmware ? 60 : 1; // RRF M203 and M566 are in mm/min   
         file.write_format("M201 X%d Y%d Z%d E%d ; sets maximum accelerations, mm/sec^2\n",
             int(print.config().machine_max_acceleration_x.values.front() + 0.5),
             int(print.config().machine_max_acceleration_y.values.front() + 0.5),
@@ -1891,7 +1891,7 @@ void GCodeGenerator::print_machine_envelope(GCodeOutputStream &file, const Print
 
         assert(is_decimal_separator_point());
         file.write_format(flavor == gcfRepRapFirmware
-            ? "M566 X%.2lf Y%.2lf Z%.2lf E%.2lf ; sets the jerk limits, mm/min\n"
+            ? "M566 X%.2lf Y%.2lf Z%.2lf E%.2lf ; sets the jerk limits, mm/min   \n"
             : "M205 X%.2lf Y%.2lf Z%.2lf E%.2lf ; sets the jerk limits, mm/sec\n",
             print.config().machine_max_jerk_x.values.front() * factor,
             print.config().machine_max_jerk_y.values.front() * factor,
@@ -3496,7 +3496,7 @@ std::string GCodeGenerator::_extrude(
     // cap speed with max_volumetric_speed anyway (even if user is not using autospeed)
     speed = cap_speed(speed, m_config, m_writer.extruder()->id(), path_attr);
 
-    double F = speed * 60;  // convert mm/sec to mm/min
+    double F = speed * 60;  // convert mm/sec to mm/min   
 
     // extrude arc or line
     if (m_enable_extrusion_role_markers)

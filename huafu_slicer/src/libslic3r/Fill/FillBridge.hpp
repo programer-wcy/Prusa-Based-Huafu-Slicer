@@ -10,6 +10,8 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/connected_components.hpp>  
+
 #include "FillBase.hpp"
 
 
@@ -32,11 +34,14 @@ typedef bg::model::polygon<Point_t> Polygon_t;
 
 // 多边形集合
 typedef bg::model::multi_polygon<Polygon_t> MultiPolygon;
+// 环的点序列类型
+using RingPointRange = typename Polygon_t::ring_type;
 
 // 定义环类型
 typedef bg::model::ring<Point_t> Ring;
 typedef bg::model::ring<Point_t> Ring_t;
 
+using Linestring_t = bg::model::linestring<Point_t>;
 using BBox = bg::model::box<Point_t>;
 
 // 定义折线类型（用于表示直线）
@@ -62,6 +67,13 @@ typedef boost::graph_traits<ShapeGraph>::vertex_iterator VertexIter; // 顶点�
 typedef boost::graph_traits<ShapeGraph>::vertex_descriptor Vertex; // 顶点句柄
 typedef boost::graph_traits<ShapeGraph>::edge_descriptor   Edge;   // 边句柄
 typedef boost::graph_traits<ShapeGraph>::out_edge_iterator OutEdgeIter;
+
+// 定义连通子图类型：存储顶点集合、边集合、子图对象
+struct ConnectedSubgraph {
+    std::vector<Vertex> vertices;  // 子图顶点
+    std::vector<Edge> edges;       // 子图边
+    ShapeGraph subgraph;           // 独立的子图对象（可选）
+};
 
 // 定义路径类型（顶点序列）
 typedef std::vector<Vertex> Path;
@@ -104,6 +116,7 @@ struct RingNode {
     int orientation; //方向 -1 向内 1 向外
     std::vector<RingNode> children; //子节点集
     RingNode* parent; //父节点
+    int level = -1;
     bool isHide{ false }; //在最终路径中是否呈现 false 呈现  true 不呈现
     // 构造函数，方便初始化
     RingNode(const IdIndex id, const Ring& ring, const int orientation = 0)
@@ -125,19 +138,20 @@ struct BridgeMap {
     Point_t to2;
     IdIndex from_ii;
     IdIndex to_ii;
+    bool is_visited;
     // 默认构造函数
     BridgeMap()
         : from(0, 0), to(0, 0), from2(0, 0), to2(0, 0),  // 给 Point_t 传默认参数
-        from_ii({}), to_ii({}) {
+        from_ii({}), to_ii({}), is_visited(false) {
     }                       
 
     BridgeMap(Point_t from, Point_t to, 
         Point_t from2, Point_t to2, IdIndex from_ii
-        , IdIndex to_ii
+        , IdIndex to_ii, bool is_visited
     ) :
         from(from), to(to), 
         from2(from2), to2(to2), 
-        from_ii(from_ii), to_ii(to_ii){
+        from_ii(from_ii), to_ii(to_ii), is_visited(is_visited){
     }
 };
 
@@ -178,17 +192,17 @@ public:
 
 private:
 
-
     std::map<size_t, std::vector<RingNode>> ringNodes;
     std::vector<BridgeMap> bridges;
-
-    std::map<IdIndex, std::vector<IdIndex>> offsetMap;
+    std::vector<Ring> all_rings;
+    std::map<IdIndex, RingNode> ring_map;
+        std::map<IdIndex, std::vector<IdIndex>> offsetMap;
     std::vector<MergeMap> containMap;
     std::vector<MergeMap2> mergeMap2;
     size_t maxRid = 1;
-    bool isFront = false;
     double _offset = 40000; //偏移距离
     double _line_spacing = 0;
+    std::vector<Point_t> path;
     double area_threshold = sqr(scaled<double>(0.001)); //面积阈值
 
     Polygon_t b_polygon;
@@ -205,11 +219,6 @@ private:
         double area_threshold
     );
 
-    std::vector<Ring> getFallbackRings(
-        const Ring& original_ring,
-        double original_area,
-        const MultiPolygon& intersectionMP
-    );
 
     //生成环集
     void generateRings();
@@ -235,7 +244,16 @@ private:
 
     void handleBridge(IdIndex o_ii, IdIndex i_ii);
 
+    //递归遍历环
+    void traverseRing(
+        RingNode& node,
+        IdIndex parent,
+        Point_t& start,
+        Point_t& end,
+        bool isOutermostLayer  //是否最外层
+    );
 
+    int findIndex(std::vector<Point_t> points, const Point_t& p0);
 
     std::vector<RingNode> compute_complex_polygon_merge(
         const std::vector<RingNode>& outers
@@ -246,7 +264,6 @@ private:
     Point_t closest_point_on_segment(const Point_t& p, const Point_t& seg_start, const Point_t& seg_end);
     Point_t find_closest_point_on_ring_edges(Ring& ring, const Point_t& p0, size_t& e_index1);
     int findPointIndex(const Ring& ring, const Point_t& p0);
-    bool does_segment_cross_ring(const Segment& seg, const Ring& ring);
 
 
     auto get_bbox(const Polygon_t& poly);
@@ -297,7 +314,6 @@ private:
         }
     }
 
-
     void insertPointIntoRing(Ring& r, const Point_t& p0) {
         if (r.empty()) {
             r.push_back(p0);
@@ -338,8 +354,69 @@ private:
         }
     }
 
+    // 在向量中查找点的索引
+    size_t findPoint(const std::vector<Point_t>& points, const Point_t& target) {
+        for (size_t i = 0; i < points.size(); ++i) {
+            if (equal(points[i], target)) {
+                return i;
+            }
+        }
+        return -1; // 返回无效索引
+    }
 
-    // 修复后的凸包计算函数
+    bool removePointsBetween(std::vector<Point_t>& points, const Point_t& p, const Point_t& p1) {
+        // 1. 定位两点索引
+        int idx_p = findPoint(points, p);
+        int idx_p1 = findPoint(points, p1);
+
+        // 2. 处理异常情况
+        if (idx_p == -1 || idx_p1 == -1) {
+            // 某点不存在于vector中
+            return false;
+        }
+        if (idx_p == idx_p1) {
+            // 两点是同一个点，无中间点可删
+            return true;
+        }
+
+        // 3. 确定删除区间（[start+1, end-1]）
+        int start = std::min(idx_p, idx_p1);
+        int end = std::max(idx_p, idx_p1);
+
+        // 4. 删除区间内元素（vector::erase支持[first, last)区间删除）
+        // 若start+1 >= end，说明两点相邻，无中间点
+        if (start + 1 < end) {
+            points.erase(points.begin() + start + 1, points.begin() + end);
+        }
+
+        return true;
+    }
+
+    Ring polygonToRing(const Polygon polygon) {
+        Points points = polygon.points;
+        Point first = points[0];
+        points.push_back(first); // 闭合
+        Ring inner_ring;
+        inner_ring.reserve(points.size());
+        for (const Point& p : points) {
+            inner_ring.emplace_back(p.x(), p.y());
+        }
+        return inner_ring;
+    }
+
+    //初始化
+    void init() {
+        o_polygons.clear();
+        b_polygon.clear();
+
+        maxRid = 1;
+        ringNodes.clear();
+        offsetMap.clear();
+        containMap.clear();
+        mergeMap2.clear();
+    }
+
+
     Polygon_t computeConvexHull(const std::vector<Point_t>& points) {
         bg::model::linestring<Point_t> line;
         for (const auto& point : points) {
@@ -428,7 +505,8 @@ private:
 
         return false;
     }
-   
+
+
     // 使用凸包方法提取分离的多边形
     std::vector<Polygon_t> extractPolygonsWithoutThreshold(
         const std::vector<Point_t>& all_points, Polygon_t& polygon) {
@@ -469,137 +547,9 @@ private:
     }
 
 
-
-    // 在向量中查找点的索引
-    size_t findPointIndex(const std::vector<Point_t>& points, const Point_t& target) {
-        for (size_t i = 0; i < points.size(); ++i) {
-            if (equal(points[i], target)) {
-                return i;
-            }
-        }
-        return points.size(); // 返回无效索引
-    }
-
-
-
-    // 查找欧拉回路的函数（基于Hierholzer算法）
-    std::vector<Vertex> findEulerCircuit(ShapeGraph& graph) {
-        std::vector<Vertex> circuit;
-        std::stack<Vertex> vertexStack;
-
-        // 选择起始顶点（任意顶点）
-        Vertex start = *boost::vertices(graph).first;
-        vertexStack.push(start);
-
-        while (!vertexStack.empty()) {
-            Vertex v = vertexStack.top();
-            bool hasUnvisitedEdge = false;
-
-            // 查找未访问的边
-            std::pair<OutEdgeIter, OutEdgeIter> edges = boost::out_edges(v, graph);
-            for (OutEdgeIter eit = edges.first; eit != edges.second; ++eit) {
-                Edge e = *eit;
-                if (!graph[e].visited) {
-                    graph[e].visited = true;  // 标记为已访问
-                    hasUnvisitedEdge = true;
-
-                    // 获取相邻顶点
-                    Vertex u = boost::target(e, graph);
-                    if (u == v) u = boost::source(e, graph);
-
-                    vertexStack.push(u);
-                    break;
-                }
-            }
-
-            if (!hasUnvisitedEdge) {
-                vertexStack.pop();
-                circuit.push_back(v);
-            }
-        }
-
-        // 反转得到正确的路径顺序
-        std::reverse(circuit.begin(), circuit.end());
-        return circuit;
-    }
-
-    // 环形 vector：精准处理 v1 和 v2 的前后关系，删除较短路径的中间顶点
-    void erase_between_vertices_ring(ShapeGraph& graph, std::vector<Vertex>& vertices, Vertex v1, Vertex v2) {
-        std::vector<size_t> _vertex_index_list;
-        size_t h, k;
-        size_t v_count = vertices.size();
-        for (size_t i = 0; i < v_count; i++) {
-            if (equal(graph[v1], graph[vertices[i]])) {
-                k = i;
-            }
-            else if (equal(graph[v2], graph[vertices[i]])) {
-                h = i;
-            }
-        }
-        size_t start = k < h ? k : h;
-        size_t end = k > h ? k : h;
-        if (end - start < v_count - end + start) {
-            for (size_t j = start + 1; j < end; j++) {
-                _vertex_index_list.push_back(j);
-            }
-        }
-        else {
-            for (size_t j = 0; j < start; j++) {
-                _vertex_index_list.push_back(j);
-            }
-            for (size_t j = end + 1; j < v_count; j++) {
-                _vertex_index_list.push_back(j);
-            }
-        }
-
-        // 将删除索引转换为集合便于快速查找
-        std::unordered_set<size_t> remove_set(_vertex_index_list.begin(),
-            _vertex_index_list.end());
-
-        // 创建新向量，只保留不需要删除的顶点
-        std::vector<Vertex> new_vertices;
-        new_vertices.reserve(vertices.size() - remove_set.size());
-
-        for (size_t i = 0; i < vertices.size(); ++i) {
-            if (remove_set.find(i) == remove_set.end()) {
-                new_vertices.push_back(vertices[i]);
-            }
-        }
-
-        // 交换内容
-        vertices.swap(new_vertices);
-    }
-
-    // 删除两个顶点之间的边
-    bool remove_edge_between_vertices(ShapeGraph& graph, Vertex v1, Vertex v2) {
-        // 调用 BGL 的 remove_edge 函数，返回是否成功删除边
-        // 对于无向图，v1 和 v2 的顺序不影响结果
-        std::pair<boost::graph_traits<ShapeGraph>::edge_descriptor, bool> result =
-            boost::edge(v1, v2, graph);
-
-        if (result.second) {
-            // 边存在，执行删除
-            boost::remove_edge(result.first, graph);
-            return true; // 删除成功
-        }
-        else {
-            // 边不存在，无需删除
-            return false; // 删除失败（边不存在）
-        }
-    }
-
-    Vertex findVertexByPoint(const ShapeGraph& graph, const Point_t& from,
-        const std::vector<Vertex>& from_ring_vertex) {
-        auto it = std::find_if(from_ring_vertex.begin(), from_ring_vertex.end(),
-            [&graph, &from](Vertex v) {
-                return graph[v].x() == from.x() && graph[v].y() == from.y();
-            });
-        return *it;
-    }
-
-    
 };
 
 
+ 
 }; // namespace Slic3r
 #endif // slic3r_FillBridge_hpp_

@@ -764,9 +764,8 @@ bool PrintObject::invalidate_state_by_config_options(
             || opt_key == "interlocking_beam"
             || opt_key == "interlocking_orientation"
             || opt_key == "interlocking_beam_layer_count"
-            || opt_key == "interlocking_depth"
-            || opt_key == "interlocking_boundary_avoidance"
-            || opt_key == "interlocking_beam_width") {
+            || opt_key == "interlocking_depth" 
+            || opt_key == "interlocking_boundary_avoidance" ) {
             steps.emplace_back(posSlice);
 		} else if (
                opt_key == "elefant_foot_compensation"
@@ -850,7 +849,8 @@ bool PrintObject::invalidate_state_by_config_options(
             || opt_key == "infill_anchor"
             || opt_key == "infill_anchor_max"
             || opt_key == "top_infill_extrusion_width"
-            || opt_key == "first_layer_extrusion_width") {
+            || opt_key == "first_layer_extrusion_width" ||
+                   opt_key == "carbon_fiber_parallel_line_spacing" /*added by wangcy*/) {
             steps.emplace_back(posInfill);
         } else if (opt_key == "fill_pattern") {
             steps.emplace_back(posPrepareInfill);

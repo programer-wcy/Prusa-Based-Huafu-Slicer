@@ -645,7 +645,7 @@ std::vector<PerExtruderAdjustments> CoolingBuffer::parse_layer_gcode(const std::
                     //auto [pend, ec] = 
                         fast_float::from_chars(&*(++ c), sline.data() + sline.size(), new_pos[axis]);
                     if (axis == AxisIdx::F) {
-                        // Convert mm/min to mm/sec.
+                        // Convert mm/min    to mm/sec.
                         new_pos[AxisIdx::F] /= 60.f;
                         if ((line.type & CoolingLine::TYPE_G92) == 0)
                             // This is G0 or G1 line and it sets the feedrate. This mark is used for reducing the duplicate F calls.

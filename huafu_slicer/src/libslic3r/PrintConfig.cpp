@@ -1190,6 +1190,81 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionFloat(30));
 
+    def = this->add("carbon_fiber_parallel_line_spacing", coFloat);
+    def->label = L("carbon_fiber_parallel_line_spacing");
+    def->sidetext = L("mm");
+    def->min = 0.6;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(0.8));
+
+    //------------ added by wangcy --------------------------
+    def = this->add("carbon_fiber_turn_angle_less_than_95_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(30));
+
+    def = this->add("carbon_fiber_turn_angle_less_than_95_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+
+    def = this->add("carbon_fiber_turn_angle_between_95_and_130_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(60));
+
+    def = this->add("carbon_fiber_turn_angle_between_95_and_130_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_turn_angle_between_130_and_145_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(60));
+
+    def = this->add("carbon_fiber_turn_angle_between_130_and_145_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_turn_angle_between_145_and_180_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(120));
+
+    def = this->add("carbon_fiber_turn_angle_between_145_and_180_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+
+    def = this->add("carbon_fiber_straight_line_speed", coFloat);
+    def->label = L("Speed for going forward along a staight line");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(800));
+
+    //------------ end adding --------------------------
+
     /////////////////////////////////
     def = this->add("extruder_colour", coStrings);
     def->label = L("Extruder Color");
