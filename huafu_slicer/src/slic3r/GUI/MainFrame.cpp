@@ -598,7 +598,8 @@ void MainFrame::update_title()
     if (wxGetApp().is_editor())
         title += (" " + _L("based on Slic3r"));
 
-    SetTitle(title);
+    //SetTitle(title);
+    SetTitle(_L("Slicer-1.1"));
 }
 
 static wxString GetTooltipForSettingsButton(PrinterTechnology pt)
@@ -806,7 +807,7 @@ void MainFrame::create_preset_tabs()
     add_created_tab(new TabPrinter(m_tabpanel), wxGetApp().preset_bundle->printers.get_edited_preset().printer_technology() == ptFFF ? "printer" : "sla_printer");
     
     m_printables_webview = new PrintablesWebViewPanel(m_tabpanel);
-    add_printables_webview_tab();
+    //add_printables_webview_tab();
    
     m_connect_webview = new ConnectWebViewPanel(m_tabpanel);
     m_printer_webview = new PrinterWebViewPanel(m_tabpanel, L"");
@@ -1032,7 +1033,7 @@ void MainFrame::reload_item_function_cb()
 void Slic3r::GUI::MainFrame::refresh_account_menu(bool avatar/* = false */)
 {
     // Update User name in TopBar
-    m_bar_menus.UpdateAccountMenu();
+    //m_bar_menus.UpdateAccountMenu();
 
     m_tabpanel->GetTopBarItemsCtrl()->UpdateAccountButton(avatar);
     m_tmp_top_bar->GetTopBarItemsCtrl()->UpdateAccountButton(avatar);
@@ -1769,8 +1770,8 @@ void MainFrame::init_menubar_as_editor()
     m_menubar->Append(windowMenu, _L("&Window"));
     if (viewMenu) m_menubar->Append(viewMenu, _L("&View"));
     // Add additional menus from C++
-    m_menubar->Append(wxGetApp().get_config_menu(this), _L("&Configuration"));
-    m_menubar->Append(helpMenu, _L("&Help"));
+    //m_menubar->Append(wxGetApp().get_config_menu(this), _L("&Configuration"));
+    //m_menubar->Append(helpMenu, _L("&Help"));
 
     SetMenuBar(m_menubar);
 
