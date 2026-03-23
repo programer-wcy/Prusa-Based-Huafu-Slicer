@@ -849,8 +849,9 @@ bool PrintObject::invalidate_state_by_config_options(
             || opt_key == "fill_angle"
             || opt_key == "infill_anchor"
             || opt_key == "infill_anchor_max"
-            || opt_key == "top_infill_extrusion_width"
-            || opt_key == "first_layer_extrusion_width") {
+            || opt_key == "top_infill_extrusion_width" ||
+                   opt_key == "first_layer_extrusion_width" ||
+                   opt_key == "carbon_fiber_parallel_line_spacing" /*added by wangcy*/) {
             steps.emplace_back(posInfill);
         } else if (opt_key == "fill_pattern") {
             steps.emplace_back(posPrepareInfill);

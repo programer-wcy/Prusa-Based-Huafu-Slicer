@@ -147,7 +147,8 @@ static const t_config_enum_values s_keys_map_InfillPattern {
     { "adaptivecubic",      ipAdaptiveCubic },
     { "supportcubic",       ipSupportCubic },
     { "lightning",          ipLightning },
-    { "zigzag",             ipZigZag }
+    { "zigzag",             ipZigZag },
+    {"doublelinebridging", ipDoublelineBridging}
 };
 CONFIG_OPTION_ENUM_DEFINE_STATIC_MAPS(InfillPattern)
 
@@ -1175,6 +1176,95 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionFloat(20));
 
+    def = this->add("carbon_fiber_pre_extrude_length", coFloat);
+    def->label = L("Carbon Fiber Pre-extrude length");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(50));
+
+
+    def = this->add("carbon_fiber_cut_reserve_length", coFloat);
+    def->label = L("Carbon Fiber cut_reserve length");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(49));
+
+    def = this->add("carbon_fiber_parallel_line_spacing", coFloat);
+    def->label = L("carbon_fiber_parallel_line_spacing");
+    def->sidetext = L("mm");
+    def->min = 0.6;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(0.8));
+
+    //------------ added by wangcy --------------------------
+    def = this->add("carbon_fiber_turn_angle_less_than_95_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(30));
+
+    def = this->add("carbon_fiber_turn_angle_less_than_95_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_turn_angle_between_95_and_130_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(60));
+
+    def = this->add("carbon_fiber_turn_angle_between_95_and_130_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_turn_angle_between_130_and_145_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(60));
+
+    def = this->add("carbon_fiber_turn_angle_between_130_and_145_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_turn_angle_between_145_and_180_speed", coFloat);
+    def->label = L("Speed");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(120));
+
+    def = this->add("carbon_fiber_turn_angle_between_145_and_180_deceleration_radius", coFloat);
+    def->label = L("Radius");
+    def->sidetext = L("mm");
+    def->min = 0;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(3));
+
+    def = this->add("carbon_fiber_straight_line_speed", coFloat);
+    def->label = L("Speed for going forward along a staight line");
+    def->sidetext = L("mm/min   ");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionFloat(800));
+
+    //------------ end adding --------------------------
+
+
     def = this->add("extruder_colour", coStrings);
     def->label = L("Extruder Color");
     def->tooltip = L("This is only used in the Slic3r interface as a visual help.");
@@ -1601,7 +1691,8 @@ void PrintConfigDef::init_fff_params()
         { "adaptivecubic",      L("Adaptive Cubic")},
         { "supportcubic",       L("Support Cubic")},
         { "lightning",          L("Lightning")},
-        { "zigzag",             L("Zig Zag")}
+        {"zigzag",              L("Zig Zag")},
+        {"doublelinebridging",  L("Doubleline Bridging")}
     });
     def->set_default_value(new ConfigOptionEnum<InfillPattern>(ipStars));
 

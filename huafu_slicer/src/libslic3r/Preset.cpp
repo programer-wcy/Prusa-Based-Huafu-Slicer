@@ -513,6 +513,17 @@ static std::vector<std::string> s_Preset_print_options {
     "automatic_extrusion_widths", "automatic_infill_combination", "automatic_infill_combination_max_layer_height",
     "bed_temperature_extruder", "interlocking_beam", "interlocking_orientation", "interlocking_beam_layer_count", "interlocking_depth", "interlocking_boundary_avoidance", "interlocking_beam_width",
     "travel_short_distance_acceleration",
+    "carbon_fiber_parallel_line_spacing",
+
+    "carbon_fiber_turn_angle_less_than_95_speed",
+    "carbon_fiber_turn_angle_less_than_95_deceleration_radius",
+    "carbon_fiber_turn_angle_between_95_and_130_speed",
+    "carbon_fiber_turn_angle_between_95_and_130_deceleration_radius",
+    "carbon_fiber_turn_angle_between_130_and_145_speed",
+    "carbon_fiber_turn_angle_between_130_and_145_deceleration_radius",
+    "carbon_fiber_turn_angle_between_145_and_180_speed",
+    "carbon_fiber_turn_angle_between_145_and_180_deceleration_radius",
+    "carbon_fiber_straight_line_speed"
 };
 
 static std::vector<std::string> s_Preset_filament_options {
@@ -560,7 +571,7 @@ static std::vector<std::string> s_Preset_printer_options {
     "max_print_height", "default_print_profile", "inherits",
     "remaining_times", "silent_mode",
     "machine_limits_usage", "thumbnails", "thumbnails_format",
-    "nozzle_high_flow", "extruder_clearance_radius", "extruder_clearance_height"
+    "nozzle_high_flow", "extruder_clearance_radius", "extruder_clearance_height", "carbon_fiber_pre_extrude_length","carbon_fiber_cut_reserve_length" 
 };
 
 static std::vector<std::string> s_Preset_sla_print_options {

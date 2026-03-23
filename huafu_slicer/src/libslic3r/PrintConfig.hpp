@@ -107,6 +107,7 @@ enum InfillPattern : int {
     ipLightning,
     ipEnsuring,
     ipZigZag,
+    ipDoublelineBridging,
     ipCount,
 };
 
@@ -1016,6 +1017,16 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionFloats,             wiping_volumes_matrix))
     ((ConfigOptionBool,               wiping_volumes_use_custom_matrix))
     ((ConfigOptionFloat,              z_offset))
+    ((ConfigOptionFloat, carbon_fiber_parallel_line_spacing))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_less_than_95_speed))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_less_than_95_deceleration_radius))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_95_and_130_speed))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_95_and_130_deceleration_radius))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_130_and_145_speed))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_130_and_145_deceleration_radius))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_145_and_180_speed))
+    ((ConfigOptionFloat, carbon_fiber_turn_angle_between_145_and_180_deceleration_radius))
+    ((ConfigOptionFloat, carbon_fiber_straight_line_speed))
 )
 
 PRINT_CONFIG_CLASS_DERIVED_DEFINE0(

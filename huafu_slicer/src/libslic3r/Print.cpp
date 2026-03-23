@@ -221,7 +221,17 @@ bool Print::invalidate_state_by_config_options(const ConfigOptionResolver & /* n
             || opt_key == "spiral_vase"
             || opt_key == "filament_shrinkage_compensation_xy"
             || opt_key == "filament_shrinkage_compensation_z"
-            || opt_key == "prefer_clockwise_movements") {
+            || opt_key == "prefer_clockwise_movements" ||
+                   opt_key == "carbon_fiber_parallel_line_spacing" || /*added by wangcy*/
+                   opt_key == "carbon_fiber_turn_angle_less_than_95_speed" ||
+                   opt_key == "carbon_fiber_turn_angle_less_than_95_deceleration_radius" ||
+                   opt_key == "carbon_fiber_turn_angle_between_95_and_130_speed" ||
+                   opt_key == "carbon_fiber_turn_angle_between_95_and_130_deceleration_radius" ||
+                   opt_key == "carbon_fiber_turn_angle_between_130_and_145_speed" ||
+                   opt_key == "carbon_fiber_turn_angle_between_130_and_145_deceleration_radius" ||
+                   opt_key == "carbon_fiber_turn_angle_between_145_and_180_speed" ||
+                   opt_key == "carbon_fiber_turn_angle_between_145_and_180_deceleration_radius" ||
+                   opt_key == "carbon_fiber_straight_line_speed") {
             osteps.emplace_back(posSlice);
         } else if (
                opt_key == "complete_objects"

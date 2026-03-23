@@ -1534,6 +1534,9 @@ void TabPrint::build()
         optgroup->append_single_option_line("only_retract_when_crossing_perimeters");
         optgroup->append_single_option_line("infill_first");
 
+        optgroup = page->new_optgroup(L("Carbon Fiber Specific Parameters"));
+        optgroup->append_single_option_line("carbon_fiber_parallel_line_spacing");
+
     page = add_options_page(L("Skirt and brim"), "skirt+brim");
         category_path = "skirt-and-brim_133969#";
         optgroup = page->new_optgroup(L("Skirt"));
@@ -1594,6 +1597,42 @@ void TabPrint::build()
         optgroup->append_single_option_line("support_tree_top_rate", path);
 
     page = add_options_page(L("Speed"), "time");
+        //------------- added by wangcy --------------------------------
+        optgroup = page->new_optgroup(L("Speed and deceleration radius for printing carbon fibers"));
+        line = {L("Turn angle less than 95 degrees"), ""};
+        line.append_option(optgroup->get_option("carbon_fiber_turn_angle_less_than_95_speed"));
+        line.append_option(
+            optgroup->get_option("carbon_fiber_turn_angle_less_than_95_deceleration_radius")
+        );
+        optgroup->append_line(line);
+
+        line = {L("Turn angle between 95 and 130 degrees"), ""};
+        line.append_option(optgroup->get_option("carbon_fiber_turn_angle_between_95_and_130_speed"));
+        line.append_option(
+            optgroup->get_option("carbon_fiber_turn_angle_between_95_and_130_deceleration_radius")
+        );
+        optgroup->append_line(line);
+
+        line = {L("Turn angle between 130 and 145 degrees"), ""};
+        line.append_option(optgroup->get_option("carbon_fiber_turn_angle_between_130_and_145_speed")
+        );
+        line.append_option(
+            optgroup->get_option("carbon_fiber_turn_angle_between_130_and_145_deceleration_radius")
+        );
+        optgroup->append_line(line);
+
+        line = {L("Turn angle between 145 and 180 degrees"), ""};
+        line.append_option(optgroup->get_option("carbon_fiber_turn_angle_between_145_and_180_speed")
+        );
+        line.append_option(
+            optgroup->get_option("carbon_fiber_turn_angle_between_145_and_180_deceleration_radius")
+        );
+        optgroup->append_line(line);
+
+        optgroup->append_single_option_line("carbon_fiber_straight_line_speed");
+
+        //---------------- end adding ----------------------------------
+
         optgroup = page->new_optgroup(L("Speed for print moves"));
         optgroup->append_single_option_line("perimeter_speed");
         optgroup->append_single_option_line("small_perimeter_speed");
@@ -2878,6 +2917,10 @@ void TabPrinter::build_fff()
         optgroup = page->new_optgroup(L("Sequential printing limits"));
         optgroup->append_single_option_line("extruder_clearance_radius");
         optgroup->append_single_option_line("extruder_clearance_height");
+
+        optgroup = page->new_optgroup(L("Carbon Fiber Specific Parameters"));
+        optgroup->append_single_option_line("carbon_fiber_pre_extrude_length");
+        optgroup->append_single_option_line("carbon_fiber_cut_reserve_length");
 
     const int gcode_field_height = 15; // 150
     const int notes_field_height = 25; // 250
