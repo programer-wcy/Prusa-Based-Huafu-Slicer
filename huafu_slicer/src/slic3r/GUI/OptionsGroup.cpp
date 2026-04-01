@@ -42,6 +42,7 @@ const t_field& OptionsGroup::build_field(const t_config_option_key& id) {
 const t_field& OptionsGroup::build_field(const t_config_option_key& id, const ConfigOptionDef& opt) {
     // Check the gui_type field first, fall through
     // is the normal type.
+    const char *temp = id.c_str();
     switch (opt.gui_type) {
     case ConfigOptionDef::GUIType::select_close:
     case ConfigOptionDef::GUIType::select_open:

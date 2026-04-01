@@ -217,19 +217,23 @@ bool GLTexture::load_from_svg_files_as_sprites_array(const std::vector<std::stri
         nsvgRasterize(rast, image, 1, 1, scale, sprite_data.data(), sprite_size_px_ex, sprite_size_px_ex, sprite_stride);
 
         // makes white only copy of the sprite
-        ::memcpy((void*)sprite_white_only_data.data(), (const void*)sprite_data.data(), sprite_bytes);
+        ::memcpy((void *) sprite_white_only_data.data(), (const void *) sprite_data.data(), sprite_bytes);
         for (int i = 0; i < sprite_n_pixels; ++i) {
             int offset = i * 4;
-            if (sprite_white_only_data.data()[offset] != 0)
-                ::memset((void*)&sprite_white_only_data.data()[offset], 255, 3);
+            if (sprite_white_only_data.data()[offset] != 0 ||
+                sprite_white_only_data.data()[offset + 1] != 0 ||
+                sprite_white_only_data.data()[offset + 2] != 0)
+                ::memset((void *) &sprite_white_only_data.data()[offset], 255, 3);
         }
 
         // makes gray only copy of the sprite
-        ::memcpy((void*)sprite_gray_only_data.data(), (const void*)sprite_data.data(), sprite_bytes);
+        ::memcpy((void *) sprite_gray_only_data.data(), (const void *) sprite_data.data(), sprite_bytes);
         for (int i = 0; i < sprite_n_pixels; ++i) {
             int offset = i * 4;
-            if (sprite_gray_only_data.data()[offset] != 0)
-                ::memset((void*)&sprite_gray_only_data.data()[offset], 128, 3);
+            if (sprite_gray_only_data.data()[offset] != 0 ||
+                sprite_gray_only_data.data()[offset + 1] != 0 ||
+                sprite_gray_only_data.data()[offset + 2] != 0)
+                ::memset((void *) &sprite_gray_only_data.data()[offset], 128, 3);
         }
 
         int sprite_offset_px = sprite_id * (int)sprite_size_px_ex * m_width;

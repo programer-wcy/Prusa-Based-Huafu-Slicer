@@ -1448,7 +1448,8 @@ bool GUI_App::on_init_inner()
         }
     }
 
-    SplashScreen* scrn = nullptr;
+    // deleted by wangcy
+    /* SplashScreen *scrn = nullptr; */
     if (app_config->get_bool("show_splash_screen")) {
         // make a bitmap with dark grey banner on the left side
         wxBitmap bmp = SplashScreen::MakeBitmap(wxBitmap(from_u8(var(is_editor() ? "splashscreen.jpg" : "splashscreen-gcodepreview.jpg")), wxBITMAP_TYPE_JPEG));
@@ -1471,8 +1472,9 @@ bool GUI_App::on_init_inner()
         }
 
         // create splash screen with updated bmp
-        scrn = new SplashScreen(bmp.IsOk() ? bmp : get_bmp_bundle("PrusaSlicer", 400)->GetPreferredBitmapSizeAtScale(1.0), 
-                                wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 4000, splashscreen_pos);
+        // deleted by wangcy
+        /*scrn = new SplashScreen(bmp.IsOk() ? bmp : get_bmp_bundle("PrusaSlicer", 400)->GetPreferredBitmapSizeAtScale(1.0), 
+                                wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 4000, splashscreen_pos);*/
 
         if (!default_splashscreen_pos)
             // revert "restore_win_position" value if application wasn't crashed
@@ -1480,7 +1482,8 @@ bool GUI_App::on_init_inner()
 #ifndef __linux__
         wxYield();
 #endif
-        scrn->SetText(_L("Loading configuration")+ dots);
+        //deleted by wangcy
+        /*scrn->SetText(_L("Loading configuration")+ dots);*/
     }
 
     preset_bundle = new PresetBundle();
@@ -1587,8 +1590,9 @@ bool GUI_App::on_init_inner()
     Slic3r::I18N::set_translate_callback(libslic3r_translate_callback);
 
     // application frame
-    if (scrn && is_editor())
-        scrn->SetText(_L("Preparing settings tabs") + dots);
+    // deleted by wangcy
+    /*if (scrn && is_editor())
+        scrn->SetText(_L("Preparing settings tabs") + dots);*/
 
     if (!delayed_error_load_presets.empty())
         show_error(nullptr, delayed_error_load_presets);
@@ -1745,7 +1749,9 @@ const wxColour GUI_App::get_label_default_clr_system()
 
 const wxColour GUI_App::get_label_default_clr_modified()
 {
-    return dark_mode() ? wxColour(253, 111, 40) : wxColour(252, 77, 1);
+    // by wangcy
+    return dark_mode() ? wxColour(253, 111, 40) : wxColour(0, 0, 255);
+    // return dark_mode() ? wxColour(253, 111, 40) : wxColour(252, 77, 1);
 }
 
 const std::vector<std::string> GUI_App::get_mode_default_palette()
@@ -1764,7 +1770,7 @@ void GUI_App::init_ui_colours()
     m_color_label_default           = is_dark_mode ? wxColour(250, 250, 250): wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
     m_color_highlight_label_default = is_dark_mode ? wxColour(230, 230, 230): wxSystemSettings::GetColour(/*wxSYS_COLOUR_HIGHLIGHTTEXT*/wxSYS_COLOUR_WINDOWTEXT);
     m_color_highlight_default       = is_dark_mode ? wxColour(78, 78, 78)   : wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
-    m_color_hovered_btn_label       = is_dark_mode ? wxColour(253, 111, 40) : wxColour(252, 77, 1);
+    m_color_hovered_btn_label = is_dark_mode ? wxColour(253, 111, 40) : wxColour(63, 72, 204); // is_dark_mode ? wxColour(253, 111, 40) : wxColour(252, 77, 1); by wangcy
     m_color_default_btn_label       = is_dark_mode ? wxColour(255, 181, 100): wxColour(203, 61, 0);
     m_color_selected_btn_bg         = is_dark_mode ? wxColour(95, 73, 62)   : wxColour(228, 220, 216);
 //#else
